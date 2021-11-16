@@ -1,0 +1,15 @@
+Modifications from original blessed:
+- All makefiles :
+ Makefile,
+ Makefile.platform
+ Makefile.common in examples
+ Makefile @ radio broadcaster example
+
+- "new" platform nrf52833
+
+- In radio.c: 
+    add #include <nrf51_deprecated.h>
+
+- log.c: Full rewrite
+
+- Added exercises for lab

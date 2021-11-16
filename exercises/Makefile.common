@@ -1,0 +1,107 @@
+# Common Makefile to build applications
+PLATFORM=nRF52833
+
+
+MAKEFILE_CONFIG_PATH = $(BLESSED_PATH)
+NRF52_SDK_PATH=$(BLESSED_PATH)../nRF5_SDK_17.0.2_d674dde
+BOARD = BOARD_CUSTOM
+
+ifeq ($(PLATFORM),)
+        $(error PLATFORM is not defined)
+endif
+
+
+PLATFORM_PATH		= $(BLESSED_PATH)/platform/$(PLATFORM)
+include $(PLATFORM_PATH)/Makefile.platform
+
+ifeq ($(PROJECT_TARGET),)
+        $(error PROJECT_TARGET is not defined)
+endif
+
+BUILD_PATH		= build
+BLESSED_BUILD		= $(BLESSED_PATH)/$(BUILD_PATH)
+LIBBLESSED		= $(BLESSED_BUILD)/libblessed.a
+
+INCLUDE_PATHS		= $(PLATFORM_INCLUDE_PATHS)			\
+			  $(PROJECT_INCLUDE_PATHS)			\
+			  $(BLESSED_PATH)/stack				\
+			  $(BLESSED_PATH)/include
+
+INCLUDES		= $(addprefix -I, $(INCLUDE_PATHS))
+
+CFLAGS			= -O0 -Wall -g $(PLATFORM_CFLAGS)			\
+			  $(PROJECT_CFLAGS)				\
+			  $(INCLUDES)	\
+			  -Wa,-adhlns="$@.lst"
+
+ASMFLAGS = $(CFLAGS) 
+
+LDFLAGS			= $(PLATFORM_LDFLAGS)				\
+			  $(PROJECT_LDFLAGS)
+
+SOURCE_PATHS		= $(PROJECT_SOURCE_PATHS)			\
+			  $(PLATFORM_SOURCE_PATHS)
+SOURCE_FILES		= $(PROJECT_SOURCE_FILES)
+ASM_PATHS		= $(PROJECT_ASM_PATHS)
+ASM_FILES		= $(PROJECT_ASM_FILES)
+
+C_OBJ_FILES		= $(addprefix $(BUILD_PATH)/, $(SOURCE_FILES:.c=.o))
+ASM_OBJ_FILES		= $(addprefix $(BUILD_PATH)/, $(ASM_FILES:.S=.o))
+
+vpath %.c $(SOURCE_PATHS)
+vpath %.S $(ASM_PATHS)
+
+
+all: $(BUILD_PATH) $(BUILD_PATH)/$(PROJECT_TARGET).hex $(BUILD_PATH)/$(PROJECT_TARGET).elf
+
+
+
+$(BUILD_PATH)/$(PROJECT_TARGET).elf: $(BUILD_PATH)/$(PROJECT_TARGET).out
+	@echo -e "arm-none-eabi-objcopy\t $@"
+	arm-none-eabi-objcopy -I binary -O elf32-little $(BUILD_PATH)/$(PROJECT_TARGET).out	\
+				$(BUILD_PATH)/$(PROJECT_TARGET).elf
+
+$(BUILD_PATH)/$(PROJECT_TARGET).hex: $(BUILD_PATH)/$(PROJECT_TARGET).bin
+	@echo -e "arm-none-eabi-objcopy\t $@"
+	arm-none-eabi-objcopy -I binary -O ihex $(BUILD_PATH)/$(PROJECT_TARGET).bin	\
+				$(BUILD_PATH)/$(PROJECT_TARGET).hex
+
+$(BUILD_PATH)/$(PROJECT_TARGET).bin: $(BUILD_PATH)/$(PROJECT_TARGET).out
+	@echo -e "OBJCOPY\t $@"
+	@$(OBJCOPY) -Obinary	$(BUILD_PATH)/$(PROJECT_TARGET).out	\
+				$(BUILD_PATH)/$(PROJECT_TARGET).bin
+
+$(BUILD_PATH)/$(PROJECT_TARGET).out: $(C_OBJ_FILES) $(ASM_OBJ_FILES) $(LIBBLESSED)
+	@echo -e "LD\t $@"
+	@$(LD) $(LDFLAGS) $(C_OBJ_FILES) $(ASM_OBJ_FILES) $(LIBBLESSED) -o $@
+	@echo -e "SIZE\t $@"
+	@$(SIZE) $@
+
+$(BUILD_PATH)/%.o: %.c
+	@echo -e "CC\t $<"
+	@$(CC) $(CFLAGS) -o $@ $<
+
+$(BUILD_PATH)/%.o: %.S
+	@echo -e "CC\t $<"
+	@$(CC) $(ASMFLAGS) -o $@ $<
+
+$(BUILD_PATH):
+	@echo -e "MKDIR\t $@"
+	@-mkdir $@
+
+install: all
+	./flash_openocd.sh
+
+$(LIBBLESSED):
+	cd ../../ && make && cd - 
+
+erase:
+	@echo -e "ERASE"
+	@$(PROGRAMMER) --jlinkexe $(JLINK_EXE) erase
+
+clean:
+	@echo -e "CLEAN"
+	@rm -rf $(BUILD_PATH) *.log
+
+.PHONY: all install erase clean
+

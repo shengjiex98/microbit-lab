@@ -1,0 +1,96 @@
+NRF52_SDK_PATH=$(MAKEFILE_CONFIG_PATH)../nRF5_SDK_17.0.2_d674dde
+
+ifeq ($(NRF52_SDK_PATH),)
+        $(error NRF52_SDK_PATH is not defined)
+endif
+
+DEVICE_FAMILY	?= NRF52
+CPU 			?= cortex-m4
+SOC 			?= NRF52833
+SOC_VARIANT		?= XXAA
+BOARD			?= BOARD_PCA10001
+HEAP_SIZE		?= 0
+STACK_SIZE		?= 1024
+
+CROSS_COMPILE		?= arm-none-eabi-
+CC			= $(CROSS_COMPILE)gcc
+LD			= $(CROSS_COMPILE)gcc
+AR			= $(CROSS_COMPILE)ar
+SIZE			= $(CROSS_COMPILE)size
+OBJCOPY			= $(CROSS_COMPILE)objcopy
+OBJDUMP			= $(CROSS_COMPILE)objdump
+PROGRAMMER		?= nrftool
+JLINK_EXE		?= JLinkExe
+
+
+PLATFORM_ASM_PATHS	= $(NRF52_SDK_PATH)/modules/nrfx/mdk
+PLATFORM_ASM_FILES	=  gcc_startup_nrf52833.S
+
+PLATFORM_INCLUDE_PATHS	= $(SDK_INCLUDE_PATH)				\
+			  $(NRF52_SDK_PATH)/components/toolchain/cmsis/include			\
+			  $(NRF52_SDK_PATH)/components/libraries/util			\
+			  $(NRF52_SDK_PATH)/config/nrf52833/config			\
+			  $(NRF52_SDK_PATH)/components/drivers_nrf/nrf_soc_nosd			\
+			  $(NRF52_SDK_PATH)/modules/nrfx/mdk			\
+			  $(NRF52_SDK_PATH)/modules/nrfx/			\
+			  $(NRF52_SDK_PATH)/modules/nrfx/hal			\
+			  $(NRF52_SDK_PATH)/modules/nrfx/templates			\
+			  $(NRF52_SDK_PATH)/modules/nrfx/templates/nRF52833			\
+			  $(NRF52_SDK_PATH)/components/libraries/util			\
+			  $(NRF52_SDK_PATH)/components/libraries/uart		\
+			  $(NRF52_SDK_PATH)/components/libraries/fifo		\
+			  $(NRF52_SDK_PATH)/components/libraries/gpiote		\
+			  $(NRF52_SDK_PATH)/components/libraries/delay		\
+			  $(NRF52_SDK_PATH)/components/boards		\
+			  $(PLATFORM_PATH)
+
+
+PLATFORM_SOURCE_PATHS	= $(SDK_SOURCE_PATH)				\
+			  $(NRF52_SDK_PATH)/app_common			\
+			  $(NRF52_SDK_PATH)/modules/nrfx/mdk			\
+			  $(NRF52_SDK_PATH)/components/libraries/uart		\
+			  $(NRF52_SDK_PATH)/components/libraries/fifo		\
+			  $(NRF52_SDK_PATH)/components/libraries/gpiote		\
+			  $(NRF52_SDK_PATH)/components/libraries/uart		\
+			  $(SDK_TEMPLATE_PATH)				\
+			  $(SDK_TEMPLATE_PATH/gcc)			\
+			  $(PLATFORM_PATH)
+
+
+PLATFORM_CFLAGS		= -mcpu=$(CPU)					\
+			  -D$(BOARD)					\
+			  -D$(SOC)					\
+			  -D$(SOC)_$(SOC_VARIANT)				\
+			  -mfloat-abi=soft				\
+			  --std=gnu99					\
+			  -mthumb					\
+			  -Wall						\
+			  -c                    \
+              -g 
+PLATFORM_ASMFLAGS	= $(PLATFORM_CFLAGS)				\
+			  -x assembler-with-cpp				\
+			  -D__HEAP_SIZE=$(HEAP_SIZE)			\
+			  -D__STACK_SIZE=$(STACK_SIZE)
+
+LINKER_SCRIPT		= nrf52833_xxaa.ld
+PLATFORM_LDFLAGS	= -T$(NRF52_SDK_PATH)/modules/nrfx/mdk/$(LINKER_SCRIPT)	\
+			  -L$(NRF52_SDK_PATH)/modules/nrfx/mdk/		\
+			  -mabi=aapcs					\
+			  -Xlinker					\
+			  -Map=$(BUILD_PATH)/$(PROJECT_TARGET).map	\
+			  -mthumb					\
+			  -mcpu=$(CPU)
+
+
+PLATFORM_SOURCE_FILES	= system_nrf52.c				\
+			  app_fifo.c					\
+			  app_gpiote.c					\
+			  delay.c					\
+			  log.c						\
+			  timer.c					\
+			  radio.c                                       \
+                          random.c					\
+                          evtloop.c					\
+                          ll-plat.c        \
+            simple_ringbuf.c  \
+                                          
