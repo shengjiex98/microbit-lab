@@ -171,8 +171,9 @@ You should now be able to see the LEDs on board blinking.
 We here list solutions for all errors that might arise during the installation we are aware of.
 
 ## OpenOCD
-### Error Message: "configure: error jimttcl not found, run git submodule init and git submodule update"
-in your openocd-code directory, type:
+**Error Message: "configure: error jimttcl not found, run `git submodule init` and `git submodule update`"**
+
+In your openocd-code directory, type:
 ```
 $ cd src/jtag/drivers/libjaylink
 $./autogen.sh
@@ -187,7 +188,9 @@ Please type:
 git submodule init
 git submodule update
 ```
-### Error Message: Unable to access 'XY': server certificate verification failed.
+
+**Error Message: Unable to access 'XY': server certificate verification failed.**
+
 Please type
 ```
 $ git config --global http.sslverify false
@@ -195,7 +198,8 @@ $ git config --global http.sslverify false
 (Thanks to Bo-Yue Zeng for reporting this problem and solution)
 
 ## Errors Using the Lab Software Project
-### "nrf_gpio.h" is not found
+**"nrf_gpio.h" is not found**
+
 Your directory structure is probably wrong, such that files from the nRF52 SDK cannot be found.
 The structure should look like this:
  ```
@@ -204,10 +208,8 @@ The structure should look like this:
   |- microbit_lab-main
 ```
 Hence, the nRF52 SDK and our lab source code should form subdirectories of the same directory. Don't make nRF5_SDK_17.0.2_d674dde SDK a subfolder of microbit_lab-main!
-  
 
-
-### Debugging in Eclipse fails with "Error: unable to find matching CMSIS-DAP deviceError: unable to find matching CMSIS-DAP device"
+**Debugging in Eclipse fails with "Error: unable to find matching CMSIS-DAP device"**
 
 in your openocd-code directory, type:
  ```
