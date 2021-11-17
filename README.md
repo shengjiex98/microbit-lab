@@ -55,7 +55,7 @@ $ sudo apt-get install gdb-multiarch
 
 ### Download the Nordic SDK
 
-Create an empty directory. This will be your project directory. Download [nRF5_17.0.2](https://www.nordicsemi.com/Software-and-tools/Software/nRF5/Download). Click on nRF5_17.0.2_d674dde.zip (and not the `Download` button, which would download some additional files that you won't need).
+Create an empty directory. This will be your project directory. Download [nRF5_17.0.2](https://www.nordicsemi.com/Products/Development-software/nRF5-SDK/Download). Click on nRF5_17.0.2_d674dde.zip (and not the `Download` button, which would download some additional files that you won't need).
 
 ### Clone this repository
 Put the `microbit_lab` directory alongside the `nRF5_17.0.2_d674dde` folder from last step.
