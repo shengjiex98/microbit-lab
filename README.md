@@ -58,7 +58,7 @@ $ sudo apt-get install gdb-multiarch
 Create an empty directory. This will be your project directory. Download [nRF5_17.0.2](https://www.nordicsemi.com/Products/Development-software/nRF5-SDK/Download). Click on nRF5_17.0.2_d674dde.zip (and not the `Download` button, which would download some additional files that you won't need).
 
 ### Clone this repository
-Put the `microbit_lab` directory alongside the `nRF5_17.0.2_d674dde` folder from last step.
+Put the `microbit-lab` directory alongside the `nRF5_17.0.2_d674dde` folder from last step.
 
 ### Check that `make` is installed
 
@@ -137,10 +137,10 @@ For more information regarding installing OpenOCD, refer to the `README` file in
 
 ## Run an example
 
-Open a terminal window and navigate to `[your_project_dir]/microbit_lab/exercises/lab4_and_lab5`. Then build the project by running `make`:
+Open a terminal window and navigate to `[your_project_dir]/microbit-lab/exercises/lab4_and_lab5`. Then build the project by running `make`:
 
 ```
-$ cd microbit_lab/exercises/lab1-3
+$ cd microbit-lab/exercises/lab1-3
 $ make
 ```
 
@@ -205,9 +205,9 @@ The structure should look like this:
  ```
   /
   |- nRF5_SDK_17.0.2_d674dde
-  |- microbit_lab-main
+  |- microbit-lab
 ```
-Hence, the nRF52 SDK and our lab source code should form subdirectories of the same directory. Don't make nRF5_SDK_17.0.2_d674dde SDK a subfolder of microbit_lab-main!
+Hence, the nRF52 SDK and our lab source code should form subdirectories of the same directory. Don't make nRF5_SDK_17.0.2_d674dde SDK a subfolder of microbit-lab!
 
 **Debugging in Eclipse fails with "Error: unable to find matching CMSIS-DAP device"**
 
